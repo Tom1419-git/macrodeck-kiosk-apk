@@ -1,12 +1,20 @@
 # Macro Deck Kiosk — APK plein écran pour tablette Android
 
-Petite application Android (≈ 34 Ko, aucune dépendance) qui affiche le **web client de
+Petite application Android (≈ 33 Ko, aucune dépendance) qui affiche le **web client de
 Macro Deck 3** en vrai plein écran sur une tablette : pas de barre d'adresse, pas de
 barre système, pas d'effet « site web ». Pratique pour transformer une vieille tablette
 en deck de touches mural, sans passer par l'application payante.
 
-`MacroDeckKiosk.apk` est fourni **compilé et signé** à la racine du dépôt : il suffit de
-l'installer, aucun outil de développement n'est nécessaire.
+`MacroDeckKiosk.apk` est fourni **compilé et signé** : il suffit de l'installer, aucun
+outil de développement n'est nécessaire.
+
+## Télécharger
+
+**[⬇ Télécharger MacroDeckKiosk.apk (v1.3)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)**
+— 33 Ko, signé, prêt à installer.
+
+[Toutes les versions (Releases)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases) ·
+une fois le fichier récupéré, suivre [Installation](#installation).
 
 ## Ce qu'elle fait
 
