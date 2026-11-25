@@ -1,103 +1,103 @@
-# Macro Deck Kiosk — APK plein écran pour tablette Android
+<div align="center">
 
-Petite application Android (≈ 33 Ko, aucune dépendance) qui affiche le **web client de
-Macro Deck 3** en vrai plein écran sur une tablette : pas de barre d'adresse, pas de
-barre système, pas d'effet « site web ». Pratique pour transformer une vieille tablette
-en deck de touches mural, sans passer par l'application payante.
+<img src="assets/banner.jpg" alt="Tablette murale affichant un deck de touches Macro Deck" width="100%">
 
-`MacroDeckKiosk.apk` est fourni **compilé et signé** : il suffit de l'installer, aucun
-outil de développement n'est nécessaire.
+# Macro Deck Kiosk
 
-## Télécharger
+**Transforme une tablette Android en deck de touches plein écran pour [Macro Deck 3](https://macro-deck.app).**
+Pas de navigateur, pas de barre système, pas d'application payante.
 
-**[⬇ Télécharger MacroDeckKiosk.apk (v1.3)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)**
-— 33 Ko, signé, prêt à installer.
+[![Version](https://img.shields.io/github/v/release/Tom1419-git/macrodeck-kiosk-apk?label=version&color=7C5CFF)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases)
+[![Téléchargements](https://img.shields.io/github/downloads/Tom1419-git/macrodeck-kiosk-apk/total?label=t%C3%A9l%C3%A9chargements&color=22D3EE)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases)
+[![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](#-compatibilité)
+[![APK](https://img.shields.io/badge/APK-33%20Ko-FACC15)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)
+[![Licence](https://img.shields.io/github/license/Tom1419-git/macrodeck-kiosk-apk?color=34D399)](LICENSE)
 
-[Toutes les versions (Releases)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases) ·
-une fois le fichier récupéré, suivre [Installation](#installation).
+**[⬇ Télécharger l'APK (v1.3)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)** ·
+[Releases](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases) ·
+[Installation](#-installation) ·
+[Dépannage](#-dépannage)
 
-## Ce qu'elle fait
+</div>
 
-- **Plein écran immersif** : barres Android masquées, elles ne reviennent qu'en glissant
-  depuis le bord (et disparaissent aussitôt).
-- **Écran toujours allumé** (`FLAG_KEEP_SCREEN_ON`) : la tablette ne s'éteint pas pendant
-  que le deck est affiché.
-- **Reconnexion automatique** : si le PC est éteint ou redémarre, un écran « PC
-  injoignable » s'affiche et retente toutes les 5 s ; le deck revient tout seul.
-- **Démarrage automatique** avec la tablette (récepteur `BOOT_COMPLETED`, plus les
-  actions « démarrage rapide » de certains constructeurs et la fin d'une mise à jour).
-- **Adresse mémorisée** : elle se saisit une seule fois, au premier lancement.
-- **Paysage**, **retour = 2 appuis** pour quitter (avec un toast de confirmation).
-- **Reconfiguration sans câble** : `Volume +` et `Volume −` en même temps ramène à
-  l'écran d'adresse.
-- Le WebView parle HTTP en clair vers le réseau local (config réseau dédiée) et accepte
-  la lecture audio sans geste utilisateur (widgets Music Player).
+---
 
-## Installation
+## 💡 L'idée
 
-1. Télécharger **`MacroDeckKiosk.apk`** (bouton *Download* / *Raw* sur la page du
-   fichier, ou depuis une release).
+Le web client de Macro Deck 3 fait très bien le travail, mais dans un navigateur il garde
+sa barre d'adresse, ses gestes de navigation et sa mise en veille. Pour une tablette
+posée au mur ou sur le bureau, ça casse tout.
+
+**Macro Deck Kiosk** est une coquille Android de 33 Ko, sans dépendance, qui affiche ce
+même web client en plein écran immersif et le garde vivant : écran allumé, reconnexion
+automatique si le PC s'éteint, relance au démarrage de la tablette. Le deck reste celui
+de Macro Deck — mêmes widgets, mêmes icônes, mêmes dossiers — mais on ne voit que lui.
+
+## ✨ Fonctionnalités
+
+|     | Fonction | Détail |
+| :-: | --- | --- |
+| 🖥️ | **Plein écran immersif** | Barres Android masquées ; elles ne reviennent qu'en glissant depuis le bord, et disparaissent aussitôt. |
+| 🔆 | **Écran toujours allumé** | `FLAG_KEEP_SCREEN_ON` : la tablette ne s'endort pas pendant que le deck est affiché. |
+| 🔄 | **Reconnexion automatique** | PC éteint ou en redémarrage ? Un écran « PC injoignable » s'affiche et retente toutes les 5 s ; le deck revient seul. |
+| ⚡ | **Démarrage avec la tablette** | Récepteur `BOOT_COMPLETED`, plus les actions « démarrage rapide » de certains constructeurs et la fin d'une mise à jour. |
+| 💾 | **Adresse mémorisée** | Saisie une seule fois, au premier lancement, puis conservée dans les préférences de l'app. |
+| 🎛️ | **Reconfiguration sans câble** | `Volume +` et `Volume −` en même temps ramènent à l'écran d'adresse. |
+| ↩️ | **Sortie volontaire** | Deux appuis sur Retour pour quitter, avec un toast de confirmation. |
+| 🔊 | **Audio autorisé** | Lecture sans geste utilisateur, pour les widgets Music Player. |
+| 📶 | **Réseau local** | HTTP en clair vers le PC, via une configuration réseau dédiée à l'app. |
+
+## ✅ Compatibilité
+
+- **Android 7.0+** (`minSdk 24`), `targetSdk 34`, en paysage.
+- Développé et testé sur une **Xiaomi Pad 6** (HyperOS, Android 14).
+- Fonctionne avec **Macro Deck 3** ; le web client écoute sur le port **8193**.
+
+## 📦 Installation
+
+1. Télécharger **[MacroDeckKiosk.apk](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)**.
 2. Sur la tablette, ouvrir le fichier depuis **Fichiers → Téléchargements** et autoriser
    « Installer des applis inconnues » pour l'app Fichiers si demandé.
-3. Lancer **Macro Deck**, saisir l'adresse du PC qui fait tourner Macro Deck
-   (par exemple `192.168.1.50:8193`, le port du web client est **8193**), puis
+3. Lancer **Macro Deck**, saisir l'adresse du PC (par exemple `192.168.1.50:8193`), puis
    **Se connecter**.
 
 Sur la tablette, tout ce que fait le web client (musique, lumières, volume, navigation)
-fonctionne à l'identique : l'APK n'est qu'une coquille plein écran autour du même deck.
+fonctionne à l'identique : l'APK n'est qu'une coquille autour du même deck.
 
-## Première connexion (une seule fois)
+## 🔑 Première connexion (une seule fois)
 
 Le web client de Macro Deck 3 exige une session : au premier lancement, la tablette
 affiche **« Sign in to continue »**. Sur le PC, ouvrir le panneau **Réseau** (icône Wi-Fi
 en haut à droite) de Macro Deck et saisir le **code d'appairage** à 6 chiffres sur la
-tablette. La session est stockée dans les données de l'app : elle survit aux mises à
-jour mais pas à une désinstallation.
+tablette.
 
-## Démarrage automatique
+La session est stockée dans les données de l'app : elle survit aux mises à jour, mais pas
+à une désinstallation.
+
+## 🚀 Démarrage automatique
 
 L'app se relance seule au démarrage de la tablette.
 
-**Sur Xiaomi / Redmi / POCO (MIUI, HyperOS), une autorisation est obligatoire**, sinon le
-système bloque le broadcast de démarrage :
+> [!IMPORTANT]
+> Sur **Xiaomi / Redmi / POCO (MIUI, HyperOS)**, l'autorisation est obligatoire, sinon le
+> système bloque le broadcast de démarrage :
+> **Paramètres → Applications → Gérer les applications → Macro Deck → Démarrage auto**,
+> puis **Batterie → Aucune restriction**.
 
-1. Paramètres → Applications → Gérer les applications → **Macro Deck**
-2. **Démarrage auto** → activer
-3. (recommandé) Batterie → **Aucune restriction**
-
-Sur d'autres marques, rien à faire au-delà de l'installation. Android 10+ peut aussi
+Sur les autres marques, rien à faire au-delà de l'installation. Android 10+ peut aussi
 demander « Autoriser le démarrage en arrière-plan » : accepter.
 
-## Changer l'adresse du PC
+## 🛠️ Dépannage
 
-`Volume +` et `Volume −` en même temps sur la tablette, ou bouton **Changer d'adresse**
-depuis l'écran « PC injoignable ». Rien à recompiler.
+| Symptôme | Cause / solution |
+| --- | --- |
+| **Grille grise sans icônes** | Le WebView n'a pas encore chargé le pack d'icônes. L'app purge son cache et se relance d'elle-même ; sinon redémarrer la tablette une fois la connexion établie. |
+| **« PC injoignable » en boucle** | Macro Deck n'est pas lancé, le PC et la tablette ne sont pas sur le même Wi-Fi, ou le pare-feu Windows bloque Macro Deck sur le réseau privé. Tester l'adresse depuis le navigateur de la tablette. |
+| **Pas de relance après redémarrage** | Autorisation « Démarrage auto » non accordée (voir ci-dessus). |
+| **`INSTALL_FAILED_UPDATE_INCOMPATIBLE`** | L'APK installé vient d'une autre clé de signature : désinstaller l'ancienne version avant d'installer celle-ci. |
+| **Mauvaise adresse** | `Volume +` et `Volume −` en même temps, ou **Changer d'adresse** depuis l'écran « PC injoignable ». |
 
-## Dépannage
-
-- **Grille grise sans icônes au premier lancement** : le WebView n'a pas encore chargé le
-  pack d'icônes. L'app recharge puis se relance d'elle-même ; sinon redémarrer la
-  tablette une fois la connexion établie.
-- **« PC injoignable » en boucle** : vérifier que Macro Deck tourne, que le PC et la
-  tablette sont sur le même Wi-Fi, et que le pare-feu Windows autorise Macro Deck sur le
-  réseau privé. Tester l'adresse depuis un navigateur de la tablette.
-- **La tablette ne relance pas le deck après un redémarrage** : autorisation
-  « Démarrage auto » non accordée (voir plus haut).
-- **Mise à jour refusée (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`)** : l'APK installé a été
-  signé avec une autre clé. Désinstaller l'ancienne version avant d'installer celle-ci.
-
-## Contenu du dépôt
-
-```
-AndroidManifest.xml              manifeste (min SDK 24, target 34)
-src/com/thoma/macrodeckkiosk/    MainActivity.java, BootReceiver.java
-res/                             icônes, thème, config réseau
-tools/make_icons.py              régénère les icônes (Pillow)
-build.sh                         compilation + signature, sans Gradle
-MacroDeckKiosk.apk               APK signé, prêt à installer
-```
-
-## Recompiler
+## 🔧 Recompiler
 
 Prérequis : un **JDK 17+** (`JAVA_HOME`) et un **SDK Android** avec les *build-tools 35*
 et la plateforme *android-34*.
@@ -107,16 +107,33 @@ ANDROID_SDK=/chemin/vers/android-sdk bash build.sh   # → MacroDeckKiosk.apk
 ```
 
 Pas de Gradle : `aapt2` + `javac` + `d8` + `zipalign` + `apksigner`. La clé de signature
-est créée au premier build dans `keystore/` (dossier ignoré par git) : conserve-la si tu
-veux publier des mises à jour installables par-dessus l'ancienne version.
+est créée au premier build dans `keystore/` (dossier ignoré par git) : conserve-la pour
+publier des mises à jour installables par-dessus l'ancienne version.
 
-## Notes
+## 🗂️ Structure du dépôt
+
+```text
+AndroidManifest.xml              manifeste (minSdk 24, targetSdk 34)
+src/com/thoma/macrodeckkiosk/
+├── MainActivity.java            WebView plein écran, reconnexion, watchdog
+└── BootReceiver.java            relance au démarrage de la tablette
+res/                             icônes, thème, configuration réseau
+tools/make_icons.py              génère les icônes (Pillow)
+build.sh                         compilation + signature, sans Gradle
+MacroDeckKiosk.apk               APK signé, prêt à installer
+```
+
+## 📝 Notes
 
 - Aucune configuration personnelle n'est incluse dans ce dépôt : ni adresse de PC, ni
   profil de deck, ni identifiant. L'adresse se saisit sur la tablette au premier
   lancement.
-- Développé et testé sur une Xiaomi Pad 6 (HyperOS, Android 14) ; fonctionne sur toute
-  tablette Android 7.0+ en paysage.
+- Le projet n'est pas affilié à Macro Deck : il s'agit d'un simple afficheur plein écran
+  pour son web client.
+
+## 📄 Licence
+
+[MIT](LICENSE) — fais-en ce que tu veux, y compris pour ton propre deck.
 
 ---
 
