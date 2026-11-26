@@ -248,6 +248,7 @@ public class MainActivity extends Activity {
         startPowerService();
         askNotifications();
         applyPowerIntent(getIntent());
+        checkPowerPermissions();
 
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String saved = prefs.getString(KEY_URL, null);
@@ -404,13 +405,19 @@ public class MainActivity extends Activity {
                 12, MUTED, true);
         box.addView(permHint, margin(-2, 18));
 
-        Button wakeGrant = button("Autoriser l'allumage auto", CARD, TEXT);
+        Button wakeGrant = button(overlayOk()
+                ? "Allumage auto : autorisé"
+                : "Autoriser l'allumage auto", CARD, TEXT);
         box.addView(wakeGrant, margin(dp(420), 10));
 
-        Button offGrant = button("Activer l'extinction auto", CARD, TEXT);
+        Button offGrant = button(adminOk()
+                ? "Extinction auto : activée"
+                : "Activer l'extinction auto", CARD, TEXT);
         box.addView(offGrant, margin(dp(420), 10));
 
-        Button battery = button("Batterie : aucune restriction", CARD, TEXT);
+        Button battery = button(batteryOk()
+                ? "Batterie : sans restriction"
+                : "Batterie : aucune restriction", CARD, TEXT);
         box.addView(battery, margin(dp(420), 10));
 
         TextView hint = label("Port 8193 · Volume + et Volume − en même temps pour revenir ici",
@@ -630,6 +637,32 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         applyPowerIntent(intent);
+    }
+
+    private boolean overlayOk() {
+        return Build.VERSION.SDK_INT < 23 || Settings.canDrawOverlays(this);
+    }
+
+    private boolean adminOk() {
+        DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        return dpm != null && dpm.isAdminActive(new ComponentName(this, KioskAdmin.class));
+    }
+
+    private boolean batteryOk() {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        return pm != null && pm.isIgnoringBatteryOptimizations(getPackageName());
+    }
+
+    /** Prévient si l'option est active alors qu'une autorisation manque. */
+    private void checkPowerPermissions() {
+        boolean on = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_POWER_LINK, true);
+        if (!on || Build.VERSION.SDK_INT < 23) {
+            return;
+        }
+        if (!overlayOk()) {
+            // Cas typique : l'appop est réinitialisée à chaque mise à jour de l'APK.
+            toast("Écran lié au PC : autorise « Afficher par-dessus les autres applis »");
+        }
     }
 
     private void openOverlaySettings() {
