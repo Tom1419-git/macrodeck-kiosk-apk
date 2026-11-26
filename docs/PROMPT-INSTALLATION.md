@@ -50,10 +50,10 @@ Règles :
    - `adb install -r MacroDeckKiosk.apk` (si MIUI refuse, utiliser
      `adb push MacroDeckKiosk.apk /data/local/tmp/` puis
      `adb shell pm install -r -d /data/local/tmp/MacroDeckKiosk.apk`).
-   - Vérifier : `adb shell dumpsys package com.thoma.macrodeckkiosk | grep versionName`.
+   - Vérifier : `adb shell dumpsys package com.macrodeck.kiosk | grep versionName`.
 
 3. Configurer l'adresse du PC
-   - Lancer l'app : `adb shell am start -n com.thoma.macrodeckkiosk/.MainActivity`.
+   - Lancer l'app : `adb shell am start -n com.macrodeck.kiosk/.MainActivity`.
    - L'adresse se saisit sur la tablette (champ « Adresse du PC », ex. 192.168.1.50:8193).
      Si l'écran de configuration n'est pas visible, m'indiquer d'appuyer simultanément sur
      Volume + et Volume −.
@@ -62,27 +62,27 @@ Règles :
      tablette.
 
 4. Autorisations (une seule fois, nécessaires à l'option « écran lié au PC »)
-   - Notifications : `adb shell pm grant com.thoma.macrodeckkiosk android.permission.POST_NOTIFICATIONS`
-   - Rallumage de l'écran : `adb shell appops set com.thoma.macrodeckkiosk SYSTEM_ALERT_WINDOW allow`
+   - Notifications : `adb shell pm grant com.macrodeck.kiosk android.permission.POST_NOTIFICATIONS`
+   - Rallumage de l'écran : `adb shell appops set com.macrodeck.kiosk SYSTEM_ALERT_WINDOW allow`
      (ou sur la tablette : Paramètres → Applications → Accès spéciaux → Afficher par-dessus
      les autres applis).
-   - Extinction immédiate : `adb shell dpm set-active-admin com.thoma.macrodeckkiosk/.KioskAdmin`
+   - Extinction immédiate : `adb shell dpm set-active-admin com.macrodeck.kiosk/.KioskAdmin`
      (si la commande refuse, m'indiquer d'utiliser le bouton « Activer l'extinction auto »
      de l'écran d'adresse — l'app n'utilise que la politique de verrouillage d'écran).
-   - Batterie : `adb shell dumpsys deviceidle whitelist +com.thoma.macrodeckkiosk`, et sur
+   - Batterie : `adb shell dumpsys deviceidle whitelist +com.macrodeck.kiosk`, et sur
      MIUI/HyperOS m'indiquer d'activer « Démarrage auto » (Paramètres → Applications →
      Gérer les applications → Macro Deck) et Batterie → Aucune restriction.
 
 5. Vérifier
    - `adb shell dumpsys window | grep mCurrentFocus` doit contenir
-     `com.thoma.macrodeckkiosk`.
+     `com.macrodeck.kiosk`.
    - `adb shell dumpsys power | grep mWakefulness` doit afficher `Awake`.
    - Test du lien avec le PC : couper le Wi-Fi de la tablette
      (`adb shell svc wifi disable`), attendre ~30 s, l'écran doit passer `Asleep` ;
      réactiver (`adb shell svc wifi enable`), attendre ~25 s, l'écran doit revenir
      `Awake` avec l'app au premier plan. Remettre le Wi-Fi en état à la fin.
    - Si l'option doit rester désactivée : `adb shell am start
-     -n com.thoma.macrodeckkiosk/.MainActivity --ez power_link false`.
+     -n com.macrodeck.kiosk/.MainActivity --ez power_link false`.
 
 6. Récapituler et me dire quoi vérifier à la main (rendu du deck, icônes, démarrage
    automatique de la tablette).

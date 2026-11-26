@@ -13,7 +13,7 @@ Pas de navigateur, pas de barre système, pas d'application payante.
 [![APK](https://img.shields.io/badge/APK-46%20Ko-FACC15)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.4/MacroDeckKiosk.apk)
 [![Licence](https://img.shields.io/github/license/Tom1419-git/macrodeck-kiosk-apk?color=34D399)](LICENSE)
 
-**[⬇ Télécharger l'APK (v1.4)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.4/MacroDeckKiosk.apk)** ·
+**[⬇ Télécharger l'APK (v1.4)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.5/MacroDeckKiosk.apk)** ·
 [Releases](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases) ·
 [Installation](#-installation) ·
 [Écran lié au PC](#-écran-lié-au-pc-option) ·
@@ -91,10 +91,10 @@ avec un verrou CPU partiel, donc aussi écran éteint. Dès que le PC ne répond
 En ligne de commande (voir [`docs/PROMPT-INSTALLATION.md`](docs/PROMPT-INSTALLATION.md)) :
 
 ```bash
-adb shell appops set com.thoma.macrodeckkiosk SYSTEM_ALERT_WINDOW allow
-adb shell dpm set-active-admin com.thoma.macrodeckkiosk/.KioskAdmin
-adb shell dumpsys deviceidle whitelist +com.thoma.macrodeckkiosk
-adb shell am start -n com.thoma.macrodeckkiosk/.MainActivity --ez power_link false
+adb shell appops set com.macrodeck.kiosk SYSTEM_ALERT_WINDOW allow
+adb shell dpm set-active-admin com.macrodeck.kiosk/.KioskAdmin
+adb shell dumpsys deviceidle whitelist +com.macrodeck.kiosk
+adb shell am start -n com.macrodeck.kiosk/.MainActivity --ez power_link false
 ```
 
 Aucune donnée n'est effaçable par cette app : l'administrateur sert uniquement à
@@ -106,7 +106,7 @@ verrouiller l'écran (`lockNow`).
 > ne pas éteindre un écran qu'elle ne saurait pas rallumer, et l'app le signale au
 > lancement. Les trois boutons de l'écran d'adresse affichent l'état réel (« Allumage
 > auto : autorisé » quand tout est bon). En ligne de commande :
-> `adb shell appops set com.thoma.macrodeckkiosk SYSTEM_ALERT_WINDOW allow`.
+> `adb shell appops set com.macrodeck.kiosk SYSTEM_ALERT_WINDOW allow`.
 
 ## 🤖 Guide d'installation
 
@@ -165,7 +165,7 @@ publier des mises à jour installables par-dessus l'ancienne version.
 
 ```text
 AndroidManifest.xml              manifeste (minSdk 24, targetSdk 34)
-src/com/thoma/macrodeckkiosk/
+src/com/macrodeck/kiosk/
 ├── MainActivity.java            WebView plein écran, reconnexion, watchdog
 ├── DeckPowerService.java        sonde le PC, allume/éteint l'écran
 ├── KioskAdmin.java              administrateur (verrouillage d'écran uniquement)
@@ -187,6 +187,9 @@ MacroDeckKiosk.apk               APK signé, prêt à installer
 
 ## 🕒 Versions
 
+- **1.5** — identifiant d'application neutre (`com.macrodeck.kiosk`) : plus rien de personnel
+  dans le paquet. Changer d'identifiant installe une **nouvelle app** : désinstaller la
+  1.4 avant d'installer celle-ci.
 - **1.4** — option « écran lié au PC » (la tablette s'allume et s'éteint avec le PC),
   boutons d'autorisation dans l'app, guide d'installation pour un agent IA.
 - **1.3** — première version publique : kiosque plein écran, reconnexion automatique,

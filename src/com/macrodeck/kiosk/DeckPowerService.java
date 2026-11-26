@@ -1,4 +1,4 @@
-package com.thoma.macrodeckkiosk;
+package com.macrodeck.kiosk;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -46,7 +46,7 @@ public class DeckPowerService extends Service {
     /** L'écran a été rendu au système parce que le PC est éteint. */
     static volatile boolean sleeping = false;
 
-    private static final String REVIVE_ACTION = "com.thoma.macrodeckkiosk.REVIVE";
+    private static final String REVIVE_ACTION = "com.macrodeck.kiosk.REVIVE";
     private static final long POLL_MS = 4000;
     private static final long OFF_DELAY_MS = 20000;
     private static final int TIMEOUT_MS = 2500;

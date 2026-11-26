@@ -1,4 +1,4 @@
-package com.thoma.macrodeckkiosk;
+package com.macrodeck.kiosk;
 
 import android.app.admin.DeviceAdminReceiver;
 
