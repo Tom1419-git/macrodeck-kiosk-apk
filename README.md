@@ -10,12 +10,14 @@ Pas de navigateur, pas de barre système, pas d'application payante.
 [![Version](https://img.shields.io/github/v/release/Tom1419-git/macrodeck-kiosk-apk?label=version&color=7C5CFF)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases)
 [![Téléchargements](https://img.shields.io/github/downloads/Tom1419-git/macrodeck-kiosk-apk/total?label=t%C3%A9l%C3%A9chargements&color=22D3EE)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](#-compatibilité)
-[![APK](https://img.shields.io/badge/APK-33%20Ko-FACC15)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)
+[![APK](https://img.shields.io/badge/APK-46%20Ko-FACC15)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.4/MacroDeckKiosk.apk)
 [![Licence](https://img.shields.io/github/license/Tom1419-git/macrodeck-kiosk-apk?color=34D399)](LICENSE)
 
-**[⬇ Télécharger l'APK (v1.3)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)** ·
+**[⬇ Télécharger l'APK (v1.4)](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.4/MacroDeckKiosk.apk)** ·
 [Releases](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases) ·
 [Installation](#-installation) ·
+[Écran lié au PC](#-écran-lié-au-pc-option) ·
+[Guide d'installation](#-guide-dinstallation) ·
 [Dépannage](#-dépannage)
 
 </div>
@@ -28,9 +30,10 @@ Le web client de Macro Deck 3 fait très bien le travail, mais dans un navigateu
 sa barre d'adresse, ses gestes de navigation et sa mise en veille. Pour une tablette
 posée au mur ou sur le bureau, ça casse tout.
 
-**Macro Deck Kiosk** est une coquille Android de 33 Ko, sans dépendance, qui affiche ce
+**Macro Deck Kiosk** est une coquille Android de 46 Ko, sans dépendance, qui affiche ce
 même web client en plein écran immersif et le garde vivant : écran allumé, reconnexion
-automatique si le PC s'éteint, relance au démarrage de la tablette. Le deck reste celui
+automatique si le PC s'éteint, relance au démarrage de la tablette, et — en option —
+allumage et extinction de l'écran avec le PC. Le deck reste celui
 de Macro Deck — mêmes widgets, mêmes icônes, mêmes dossiers — mais on ne voit que lui.
 
 ## ✨ Fonctionnalités
@@ -43,6 +46,8 @@ de Macro Deck — mêmes widgets, mêmes icônes, mêmes dossiers — mais on ne
 | ⚡ | **Démarrage avec la tablette** | Récepteur `BOOT_COMPLETED`, plus les actions « démarrage rapide » de certains constructeurs et la fin d'une mise à jour. |
 | 💾 | **Adresse mémorisée** | Saisie une seule fois, au premier lancement, puis conservée dans les préférences de l'app. |
 | 🎛️ | **Reconfiguration sans câble** | `Volume +` et `Volume −` en même temps ramènent à l'écran d'adresse. |
+| 🔌 | **Écran lié au PC** (option) | La tablette s'allume quand le PC démarre et s'éteint quand il s'arrête — voir [Écran lié au PC](#-écran-lié-au-pc-option). |
+| 🔔 | **Service discret** | Sonde réseau en service au premier plan, notification réduite au minimum, relance automatique si le système l'arrête. |
 | ↩️ | **Sortie volontaire** | Deux appuis sur Retour pour quitter, avec un toast de confirmation. |
 | 🔊 | **Audio autorisé** | Lecture sans geste utilisateur, pour les widgets Music Player. |
 | 📶 | **Réseau local** | HTTP en clair vers le PC, via une configuration réseau dédiée à l'app. |
@@ -55,7 +60,7 @@ de Macro Deck — mêmes widgets, mêmes icônes, mêmes dossiers — mais on ne
 
 ## 📦 Installation
 
-1. Télécharger **[MacroDeckKiosk.apk](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.3/MacroDeckKiosk.apk)**.
+1. Télécharger **[MacroDeckKiosk.apk](https://github.com/Tom1419-git/macrodeck-kiosk-apk/releases/download/v1.4/MacroDeckKiosk.apk)**.
 2. Sur la tablette, ouvrir le fichier depuis **Fichiers → Téléchargements** et autoriser
    « Installer des applis inconnues » pour l'app Fichiers si demandé.
 3. Lancer **Macro Deck**, saisir l'adresse du PC (par exemple `192.168.1.50:8193`), puis
@@ -63,6 +68,44 @@ de Macro Deck — mêmes widgets, mêmes icônes, mêmes dossiers — mais on ne
 
 Sur la tablette, tout ce que fait le web client (musique, lumières, volume, navigation)
 fonctionne à l'identique : l'APK n'est qu'une coquille autour du même deck.
+
+## 🔌 Écran lié au PC (option)
+
+Activée par défaut, débrayable dans l'app : sur l'écran d'adresse, le bouton
+**« Écran lié au PC : activé / désactivé »**. Elle répond à une envie simple — allumer le
+PC allume la tablette, éteindre le PC éteint la tablette — sans rien installer sur le PC.
+
+**Comment ça marche.** Un service au premier plan sonde `http://<pc>:8193/` toutes les 4 s
+avec un verrou CPU partiel, donc aussi écran éteint. Dès que le PC ne répond plus pendant
+~20 s (arrêt, veille, hibernation), l'écran s'éteint ; dès qu'il répond de nouveau
+(démarrage de Windows + Macro Deck), l'écran se rallume et le deck se recharge.
+
+**Trois autorisations, une seule fois**, depuis l'écran d'adresse :
+
+| Bouton | Sans lui |
+| --- | --- |
+| **Autoriser l'allumage auto** (afficher par-dessus les autres applis) | L'option reste sans effet : Android 10+ interdit de rallumer l'écran depuis l'arrière-plan. L'app ne dort donc jamais si elle ne peut pas se réveiller. |
+| **Activer l'extinction auto** (administrateur, politique `force-lock` uniquement) | L'écran s'éteint au bout du délai de veille système au lieu de s'éteindre immédiatement. |
+| **Batterie : aucune restriction** | HyperOS peut tuer le service pendant la nuit : le PC redémarrerait sans rallumer la tablette. |
+
+En ligne de commande (voir [`docs/PROMPT-INSTALLATION.md`](docs/PROMPT-INSTALLATION.md)) :
+
+```bash
+adb shell appops set com.thoma.macrodeckkiosk SYSTEM_ALERT_WINDOW allow
+adb shell dpm set-active-admin com.thoma.macrodeckkiosk/.KioskAdmin
+adb shell dumpsys deviceidle whitelist +com.thoma.macrodeckkiosk
+adb shell am start -n com.thoma.macrodeckkiosk/.MainActivity --ez power_link false
+```
+
+Aucune donnée n'est effaçable par cette app : l'administrateur sert uniquement à
+verrouiller l'écran (`lockNow`).
+
+## 🤖 Guide d'installation
+
+[`docs/PROMPT-INSTALLATION.md`](docs/PROMPT-INSTALLATION.md) contient un **prompt prêt à
+coller** dans un agent de codage (Freebuff, Claude Code, Codex, Cursor…) : il active le
+débogage adb (USB ou sans fil), installe l'APK, accorde les autorisations, vérifie le
+premier affichage et teste le lien écran/PC. La même page décrit l'installation manuelle.
 
 ## 🔑 Première connexion (une seule fois)
 
@@ -116,8 +159,11 @@ publier des mises à jour installables par-dessus l'ancienne version.
 AndroidManifest.xml              manifeste (minSdk 24, targetSdk 34)
 src/com/thoma/macrodeckkiosk/
 ├── MainActivity.java            WebView plein écran, reconnexion, watchdog
+├── DeckPowerService.java        sonde le PC, allume/éteint l'écran
+├── KioskAdmin.java              administrateur (verrouillage d'écran uniquement)
 └── BootReceiver.java            relance au démarrage de la tablette
-res/                             icônes, thème, configuration réseau
+docs/PROMPT-INSTALLATION.md      installation assistée par un agent IA
+res/                             icônes, thème, configuration réseau, politique admin
 tools/make_icons.py              génère les icônes (Pillow)
 build.sh                         compilation + signature, sans Gradle
 MacroDeckKiosk.apk               APK signé, prêt à installer

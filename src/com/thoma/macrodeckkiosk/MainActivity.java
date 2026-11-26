@@ -1,7 +1,13 @@
 package com.thoma.macrodeckkiosk;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -37,6 +43,8 @@ import android.widget.Toast;
  * - affiche le deck sans aucune barre de navigateur ni barre système ;
  * - garde l'écran allumé ;
  * - se reconnecte tout seul au PC (toutes les 5 s) quand celui-ci est éteint ;
+ * - suit l'état du PC : l'écran s'allume quand le PC démarre et s'éteint quand il
+ *   s'arrête (voir DeckPowerService) ;
  * - mémorise l'adresse du PC (Volume + et Volume − en même temps pour la changer) ;
  * - deux appuis sur Retour pour quitter.
  */
@@ -44,6 +52,8 @@ public class MainActivity extends Activity {
 
     private static final String PREFS = "kiosk";
     private static final String KEY_URL = "url";
+    /** Option : lier l'écran de la tablette à l'état du PC (activée par défaut). */
+    static final String KEY_POWER_LINK = "power_link";
     // Volontairement vide : l'APK ne contient aucune adresse personnelle.
     // Au premier lancement, l'app demande l'adresse du PC sur la tablette.
     private static final String DEFAULT_URL = "";
@@ -78,6 +88,7 @@ public class MainActivity extends Activity {
     private static final int ACCENT = 0xFF7C5CFF;
 
     private WebView web;
+    private Button powerToggle;
     private LinearLayout setupPanel;
     private LinearLayout errorPanel;
     private TextView errorText;
@@ -91,6 +102,10 @@ public class MainActivity extends Activity {
     private boolean volDown;
     private boolean purged;
     private int emptyReloads;
+
+    /** Extras envoyés par DeckPowerService. */
+    static final String EXTRA_WAKE = "wake";
+    static final String EXTRA_SLEEP = "sleep";
 
     private final Runnable retry = new Runnable() {
         @Override
@@ -230,6 +245,9 @@ public class MainActivity extends Activity {
 
         setContentView(root);
         hideBars();
+        startPowerService();
+        askNotifications();
+        applyPowerIntent(getIntent());
 
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String saved = prefs.getString(KEY_URL, null);
@@ -370,6 +388,31 @@ public class MainActivity extends Activity {
             });
         }
 
+        TextView powerHint = label("Écran lié au PC", 12, MUTED, true);
+        box.addView(powerHint, margin(-2, 26));
+
+        powerToggle = button(powerLabel(), CARD, TEXT);
+        box.addView(powerToggle, margin(dp(420), 10));
+        powerToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                togglePowerLink();
+            }
+        });
+
+        TextView permHint = label("Autorisations (une seule fois, seulement si activé)",
+                12, MUTED, true);
+        box.addView(permHint, margin(-2, 18));
+
+        Button wakeGrant = button("Autoriser l'allumage auto", CARD, TEXT);
+        box.addView(wakeGrant, margin(dp(420), 10));
+
+        Button offGrant = button("Activer l'extinction auto", CARD, TEXT);
+        box.addView(offGrant, margin(dp(420), 10));
+
+        Button battery = button("Batterie : aucune restriction", CARD, TEXT);
+        box.addView(battery, margin(dp(420), 10));
+
         TextView hint = label("Port 8193 · Volume + et Volume − en même temps pour revenir ici",
                 12, MUTED, false);
         box.addView(hint, margin(-2, 18));
@@ -384,6 +427,24 @@ public class MainActivity extends Activity {
                 }
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_URL, url).apply();
                 load(url);
+            }
+        });
+        wakeGrant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openOverlaySettings();
+            }
+        });
+        offGrant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAdminSettings();
+            }
+        });
+        battery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBatterySettings();
             }
         });
         return box;
@@ -450,6 +511,171 @@ public class MainActivity extends Activity {
 
     private void toast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Écran lié au PC                                                     */
+    /* ------------------------------------------------------------------ */
+
+    private String powerLabel() {
+        boolean on = getSharedPreferences(PREFS, MODE_PRIVATE)
+                .getBoolean(KEY_POWER_LINK, true);
+        return on ? "Écran lié au PC : activé" : "Écran lié au PC : désactivé";
+    }
+
+    private void togglePowerLink() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        boolean on = !prefs.getBoolean(KEY_POWER_LINK, true);
+        prefs.edit().putBoolean(KEY_POWER_LINK, on).apply();
+        if (powerToggle != null) {
+            powerToggle.setText(powerLabel());
+        }
+        startPowerService();
+        toast(on
+                ? "La tablette s'allumera et s'éteindra avec le PC"
+                : "La tablette reste allumée en permanence");
+    }
+
+    private void startPowerService() {
+        Intent service = new Intent(this, DeckPowerService.class);
+        try {
+            if (Build.VERSION.SDK_INT >= 26) {
+                startForegroundService(service);
+            } else {
+                startService(service);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void askNotifications() {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission("android.permission.POST_NOTIFICATIONS")
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 1);
+        }
+    }
+
+    /** Le PC répond de nouveau : écran rallumé, deck rechargé. */
+    private void wakeUp() {
+        if (Build.VERSION.SDK_INT >= 27) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        } else {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        }
+        try {
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (pm != null) {
+                PowerManager.WakeLock show = pm.newWakeLock(
+                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                        "kiosk:activity");
+                show.acquire(5000);
+            }
+        } catch (Exception ignored) {
+        }
+        keepScreenOn(true);
+        DeckPowerService.sleeping = false;
+        hideError();
+        if (web != null && currentUrl != null) {
+            web.reload();
+        }
+    }
+
+    /** Le PC est éteint : on rend l'écran au système, qui l'éteindra tout seul. */
+    private void allowSleep() {
+        keepScreenOn(false);
+    }
+
+    private void keepScreenOn(boolean on) {
+        if (on) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            if (web != null) {
+                web.setKeepScreenOn(true);
+            }
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            if (web != null) {
+                web.setKeepScreenOn(false);
+            }
+        }
+    }
+
+    private void applyPowerIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+        if (intent.hasExtra(KEY_POWER_LINK)) {
+            // Réglage par adb : am start -n …/.MainActivity --ez power_link false
+            getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+                    .putBoolean(KEY_POWER_LINK, intent.getBooleanExtra(KEY_POWER_LINK, true))
+                    .apply();
+            if (powerToggle != null) {
+                powerToggle.setText(powerLabel());
+            }
+            startPowerService();
+        }
+        if (intent.getBooleanExtra(EXTRA_WAKE, false)) {
+            wakeUp();
+        } else if (intent.getBooleanExtra(EXTRA_SLEEP, false)) {
+            allowSleep();
+        }
+        intent.removeExtra(EXTRA_WAKE);
+        intent.removeExtra(EXTRA_SLEEP);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        applyPowerIntent(intent);
+    }
+
+    private void openOverlaySettings() {
+        if (Build.VERSION.SDK_INT >= 23 && Settings.canDrawOverlays(this)) {
+            toast("Déjà autorisé : la tablette peut se rallumer seule");
+            return;
+        }
+        try {
+            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName())));
+        } catch (Exception e) {
+            toast("Paramètres → Applications → Accès spéciaux");
+        }
+    }
+
+    private void openAdminSettings() {
+        DevicePolicyManager dpm =
+                (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        ComponentName admin = new ComponentName(this, KioskAdmin.class);
+        if (dpm != null && dpm.isAdminActive(admin)) {
+            toast("Déjà activé : l'écran s'éteint dès que le PC s'arrête");
+            return;
+        }
+        try {
+            startActivity(new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                    .putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
+                    .putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "Autorise l'app à éteindre l'écran quand le PC s'éteint. "
+                            + "Aucun effacement de données."));
+        } catch (Exception e) {
+            toast("Impossible d'ouvrir l'écran d'activation");
+        }
+    }
+
+    private void openBatterySettings() {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm != null && pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            toast("Déjà sans restriction");
+            return;
+        }
+        try {
+            startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:" + getPackageName())));
+        } catch (Exception e) {
+            toast("Paramètres → Batterie → Sans restriction");
+        }
     }
 
     /* ------------------------------------------------------------------ */
