@@ -100,6 +100,14 @@ adb shell am start -n com.thoma.macrodeckkiosk/.MainActivity --ez power_link fal
 Aucune donnée n'est effaçable par cette app : l'administrateur sert uniquement à
 verrouiller l'écran (`lockNow`).
 
+> [!WARNING]
+> Une **mise à jour de l'APK** peut réinitialiser l'autorisation « Afficher par-dessus
+> les autres applis » (constaté sous HyperOS). Dans ce cas l'option se met en veille pour
+> ne pas éteindre un écran qu'elle ne saurait pas rallumer, et l'app le signale au
+> lancement. Les trois boutons de l'écran d'adresse affichent l'état réel (« Allumage
+> auto : autorisé » quand tout est bon). En ligne de commande :
+> `adb shell appops set com.thoma.macrodeckkiosk SYSTEM_ALERT_WINDOW allow`.
+
 ## 🤖 Guide d'installation
 
 [`docs/PROMPT-INSTALLATION.md`](docs/PROMPT-INSTALLATION.md) contient un **prompt prêt à
@@ -176,6 +184,13 @@ MacroDeckKiosk.apk               APK signé, prêt à installer
   lancement.
 - Le projet n'est pas affilié à Macro Deck : il s'agit d'un simple afficheur plein écran
   pour son web client.
+
+## 🕒 Versions
+
+- **1.4** — option « écran lié au PC » (la tablette s'allume et s'éteint avec le PC),
+  boutons d'autorisation dans l'app, guide d'installation pour un agent IA.
+- **1.3** — première version publique : kiosque plein écran, reconnexion automatique,
+  démarrage avec la tablette, purge du cache.
 
 ## 📄 Licence
 
